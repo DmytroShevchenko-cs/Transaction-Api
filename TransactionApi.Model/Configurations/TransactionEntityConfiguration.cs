@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using TransactionApi.DAL.Entity;
+using TransactionApi.Model.Entity;
 
-namespace TransactionApi.DAL.Configurations;
+namespace TransactionApi.Model.Configurations;
 
 public class TransactionEntityConfiguration : IEntityTypeConfiguration<TransactionEntity>
 {

@@ -1,5 +1,3 @@
-using TransactionApi.Web;
-
 namespace TransactionApi.Web;
 
 public class Program

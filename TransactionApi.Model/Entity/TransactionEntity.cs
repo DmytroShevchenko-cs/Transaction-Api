@@ -1,4 +1,4 @@
-namespace TransactionApi.DAL.Entity;
+namespace TransactionApi.Model.Entity;
 
 public class TransactionEntity
 {

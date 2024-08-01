@@ -4,9 +4,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionApi.Web", "Trans
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionApi.Test", "TransactionApi.Test\TransactionApi.Test.csproj", "{8CCD0DD4-95C4-491D-9855-979C63D0D529}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionApi.DAL", "TransactionApi.DAL\TransactionApi.DAL.csproj", "{EB367FFD-D06D-4DCB-9327-41EB0161C78D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionApi.Model", "TransactionApi.Model\TransactionApi.Model.csproj", "{EB367FFD-D06D-4DCB-9327-41EB0161C78D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionApi.BLL", "TransactionApi.BLL\TransactionApi.BLL.csproj", "{3DFF9682-F0C8-4EFE-B536-B6DC918A7152}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TransactionApi.Service", "TransactionApi.Service\TransactionApi.Service.csproj", "{3DFF9682-F0C8-4EFE-B536-B6DC918A7152}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -2,11 +2,11 @@
 TransactionApi.Web/obj/*
 TransactionApi.Web/bin/*
 
-TransactionApi.BLL/obj/*
-TransactionApi.BLL/bin/*
+TransactionApi.Service/obj/*
+TransactionApi.Service/bin/*
 
-TransactionApi.DAL/obj/*
-TransactionApi.DAL/bin/*
+TransactionApi.Model/obj/*
+TransactionApi.Model/bin/*
 
 TransactionApi.Test/obj/*
 TransactionApi.Test/bin/*

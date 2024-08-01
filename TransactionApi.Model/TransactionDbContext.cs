@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using TransactionApi.DAL.Entity;
+using TransactionApi.Model.Entity;
 
-namespace TransactionApi.DAL;
+namespace TransactionApi.Model;
 
 public class TransactionDbContext(DbContextOptions<TransactionDbContext> options) : DbContext(options)
 {

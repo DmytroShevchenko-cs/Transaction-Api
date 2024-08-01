@@ -21,7 +21,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\TransactionApi.DAL\TransactionApi.DAL.csproj" />
+      <ProjectReference Include="..\TransactionApi.Service\TransactionApi.Service.csproj" />
+      <ProjectReference Include="..\TransactionApi.Model\TransactionApi.Model.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using TransactionApi.DAL;
+using TransactionApi.Model;
+using TransactionApi.Service.Services;
+using TransactionApi.Service.Services.Interfaces;
 
 namespace TransactionApi.Web;
 
