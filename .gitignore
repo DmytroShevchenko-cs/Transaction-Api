@@ -1,0 +1,15 @@
+.idea/*
+TransactionApi.Web/obj/*
+TransactionApi.Web/bin/*
+
+TransactionApi.BLL/obj/*
+TransactionApi.BLL/bin/*
+
+TransactionApi.DAL/obj/*
+TransactionApi.DAL/bin/*
+
+TransactionApi.Test/obj/*
+TransactionApi.Test/bin/*
+
+/.vs
+appsettings.*.json
