@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using TransactionApi.Model;
+using TransactionApi.Service.Options;
 using TransactionApi.Service.Services;
 using TransactionApi.Service.Services.Interfaces;
 
@@ -20,7 +21,11 @@ public class Startup
 
         services.AddDbContext<TransactionDbContext>(options =>
             options.UseSqlServer(connectionString));
+
+        services.AddTransient<IGeolocationApiService, GeolocationApiService>();
         
+        services.Configure<TimeZoneApiOption>(Configuration.GetSection("TimeZoneApiOption"));
+        services.AddTransient<HttpClient>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
