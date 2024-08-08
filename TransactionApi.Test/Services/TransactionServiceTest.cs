@@ -17,6 +17,7 @@ public class TransactionServiceTest : DefaultServiceTest<ITransactionService, Tr
     protected override void SetUpAdditionalDependencies(IServiceCollection services)
     {
         services.AddScoped<IGeolocationApiService, GeolocationApiService>();
+        services.AddTransient<IFileConversionService, FileConversionService>();
         base.SetUpAdditionalDependencies(services);
     }
 

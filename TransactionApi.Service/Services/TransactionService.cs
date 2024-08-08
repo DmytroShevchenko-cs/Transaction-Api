@@ -1,6 +1,4 @@
 using System.Data;
-using System.Globalization;
-using CsvHelper;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
@@ -10,7 +8,7 @@ using TransactionApi.Service.Services.Interfaces;
 
 namespace TransactionApi.Service.Services;
 
-public class TransactionService(IOptions<DbConnection> connectionString, IGeolocationApiService geolocationApiService)
+public class TransactionService(IOptions<DbConnection> connectionString, IGeolocationApiService geolocationApiService, IFileConversionService fileConversionService)
     : ITransactionService
 {
     private readonly string _connectionString = connectionString.Value.ConnectionString;
@@ -18,21 +16,9 @@ public class TransactionService(IOptions<DbConnection> connectionString, IGeoloc
     /// <summary>
     /// Returns list of Transactions from file
     /// </summary>
-    public async Task<IEnumerable<TransactionEntity>> SaveDbFromCsvAsync(Stream file,
+    public async Task<IEnumerable<TransactionEntity>> SaveToDbAsync(List<TransactionEntity> transactions,
         CancellationToken cancellationToken = default)
     {
-        using var reader = new StreamReader(file);
-        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-
-        csv.Context.RegisterClassMap<TransactionEntityMap>();
-
-        var records = new List<TransactionEntity>();
-
-        await foreach (var record in csv.GetRecordsAsync<TransactionEntity>(cancellationToken))
-        {
-            records.Add(record);
-        }
-
         await using (var connection = new SqlConnection(_connectionString))
         {
             await connection.OpenAsync(cancellationToken);
@@ -40,7 +26,7 @@ public class TransactionService(IOptions<DbConnection> connectionString, IGeoloc
             {
                 try
                 {
-                    foreach (var record in records)
+                    foreach (var record in transactions)
                     {
                         var query = @"
                             MERGE INTO Transactions AS target
@@ -71,7 +57,7 @@ public class TransactionService(IOptions<DbConnection> connectionString, IGeoloc
             }
         }
 
-        return records;
+        return transactions;
     }
 
     /// <summary>

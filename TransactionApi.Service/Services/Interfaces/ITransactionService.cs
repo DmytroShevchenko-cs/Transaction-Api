@@ -6,7 +6,7 @@ namespace TransactionApi.Service.Services.Interfaces;
 
 public interface ITransactionService
 {
-    Task<IEnumerable<TransactionEntity>> SaveDbFromCsvAsync(Stream file, CancellationToken cancellationToken = default);
+    Task<IEnumerable<TransactionEntity>> SaveToDbAsync(List<TransactionEntity> transactions, CancellationToken cancellationToken = default);
     Task ExportExelAsync(CancellationToken cancellationToken = default);
 
     Task<List<TransactionEntity>> GetTransactionsByDatesAsync(DateTime from, DateTime to, 
