@@ -1,4 +1,6 @@
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using TransactionApi.Model;
 using TransactionApi.Service.Options;
@@ -32,7 +34,20 @@ public class Startup
         services.AddTransient<HttpClient>();
         
         services.AddControllers();
-        services.AddSwaggerGen();
+        services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "Transaction API",
+                Version = "v1",
+                Description = "API for transactions"
+            });
+
+            // Включаем XML-комментарии
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            c.IncludeXmlComments(xmlPath);
+        });
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
