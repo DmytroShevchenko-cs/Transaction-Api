@@ -25,7 +25,7 @@ public class GeolocationApiServiceTest : DefaultServiceTest<IGeolocationApiServi
     [TestCase("10.8277878784, -49.542523904", "-27.20507648, 175.0686826496", "2020-12-08 12:30:00", "2020-12-09 03:30:00")]
     public async Task ConvertTime_GetConvertedTime_Success(string tzFrom, string tzTo, DateTime time, DateTime expectedDateTime)
     {
-        var resultDateTime = await Service.ConvertTimeByNames(tzFrom, tzTo, time);
+        var resultDateTime = await Service.ConvertTimeByCoordinatesAsync(tzFrom, tzTo, time);
         Assert.That(resultDateTime, Is.EqualTo(expectedDateTime));
     }
     

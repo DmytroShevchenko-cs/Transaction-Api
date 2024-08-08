@@ -34,7 +34,7 @@ public class GeolocationApiService(IOptions<TimeZoneApiOption> apiOption, HttpCl
     /// <summary>
     /// Returns converted date and time
     /// </summary>
-    public async Task<DateTime> ConvertTimeByNames(string coordinatesFrom, string coordinatesTo, DateTime dateTime, CancellationToken cancellationToken = default)
+    public async Task<DateTime> ConvertTimeByCoordinatesAsync(string coordinatesFrom, string coordinatesTo, DateTime dateTime, CancellationToken cancellationToken = default)
     {
         var url = new StringBuilder(_apiOption.BaseUrl);
 

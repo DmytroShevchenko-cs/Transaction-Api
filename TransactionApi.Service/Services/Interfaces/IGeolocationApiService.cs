@@ -8,5 +8,5 @@ public interface IGeolocationApiService
     
     Task<string> GetClientTimeZone(CancellationToken cancellationToken = default);
 
-    Task<DateTime> ConvertTimeByNames(string coordinateFrom, string coordinateTo, DateTime dateTime, CancellationToken cancellationToken = default);
+    Task<DateTime> ConvertTimeByCoordinatesAsync(string coordinateFrom, string coordinateTo, DateTime dateTime, CancellationToken cancellationToken = default);
 }
