@@ -22,10 +22,14 @@ public class Startup
         services.AddDbContext<TransactionDbContext>(options =>
             options.UseSqlServer(connectionString));
 
+        services.AddTransient<ITransactionService, TransactionService>();
         services.AddTransient<IGeolocationApiService, GeolocationApiService>();
         
         services.Configure<TimeZoneApiOption>(Configuration.GetSection("TimeZoneApiOption"));
+        services.Configure<DbConnection>(Configuration.GetSection("ConnectionStrings"));
         services.AddTransient<HttpClient>();
+        
+        services.AddControllers();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -40,9 +44,18 @@ public class Startup
             app.UseExceptionHandler("/Error");
             app.UseHsts();
         }
-        
+
         app.UseRouting();
+        app.UseCors(b => b.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+        
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.UseStaticFiles();
+        
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
     }
 
 }

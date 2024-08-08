@@ -22,6 +22,7 @@ public abstract class DefaultServiceTest<TService> where TService : class
         services.AddScoped<TService>();
         services.AddScoped<HttpClient>();
         services.Configure<TimeZoneApiOption>(Configuration.GetSection("TimeZoneApiOption"));
+        services.Configure<DbConnection>(Configuration.GetSection("ConnectionStrings"));
       
     }
     
@@ -31,7 +32,8 @@ public abstract class DefaultServiceTest<TService> where TService : class
             .AddInMemoryCollection(new Dictionary<string, string>
             {
                 {"TimeZoneApiOption:BaseUrl", "https://api.ipgeolocation.io/timezone"},
-                {"TimeZoneApiOption:ApiKey", "1a7945cb423b45d9a2002cf615a35537"},
+                {"TimeZoneApiOption:ApiKey", "d3aa34850b1240378f798890e2ba637d"},
+                {"ConnectionStrings:ConnectionString", "Server=.;Database=TestTransactionDB;Trusted_Connection=True;Encrypt=False;TrustServerCertificate=True"},
             }!)
             .Build();
     }
@@ -44,9 +46,6 @@ public abstract class DefaultServiceTest<TService> where TService : class
         SetUpConfiguration();
 
         SetUpAdditionalDependencies(ServiceCollection);
-        
-        ServiceCollection.AddDbContext<TransactionDbContext>(options =>
-            options.UseInMemoryDatabase("TestTransactionDB"));
         
         var rootServiceProvider = ServiceCollection.BuildServiceProvider(new ServiceProviderOptions()
             { ValidateOnBuild = true, ValidateScopes = true });
