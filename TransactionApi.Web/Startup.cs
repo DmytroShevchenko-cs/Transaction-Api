@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.SwaggerUI;
 using TransactionApi.Model;
 using TransactionApi.Service.Options;
 using TransactionApi.Service.Services;
@@ -24,12 +25,14 @@ public class Startup
 
         services.AddTransient<ITransactionService, TransactionService>();
         services.AddTransient<IGeolocationApiService, GeolocationApiService>();
+        services.AddTransient<IFileConversionService, FileConversionService>();
         
         services.Configure<TimeZoneApiOption>(Configuration.GetSection("TimeZoneApiOption"));
         services.Configure<DbConnection>(Configuration.GetSection("ConnectionStrings"));
         services.AddTransient<HttpClient>();
         
         services.AddControllers();
+        services.AddSwaggerGen();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -38,6 +41,11 @@ public class Startup
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Transaction API V1");
+            });
         }
         else
         {
@@ -51,6 +59,7 @@ public class Startup
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseStaticFiles();
+        
         
         app.UseEndpoints(endpoints =>
         {

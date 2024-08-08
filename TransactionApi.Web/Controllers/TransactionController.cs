@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TransactionApi.Model.Entity;
 using TransactionApi.Service.Services.Interfaces;
 
 namespace TransactionApi.Web.Controllers;
@@ -7,17 +8,21 @@ namespace TransactionApi.Web.Controllers;
 [ApiController]
 [AllowAnonymous]
 [Route("api/[controller]")]
-public class TransactionController(ITransactionService transactionService) : ControllerBase
+public class TransactionController(ITransactionService transactionService, IFileConversionService fileConversionService) : ControllerBase
 {
     private readonly ITransactionService _transactionService = transactionService;
+    private readonly IFileConversionService _fileConversionService = fileConversionService;
 
     [HttpPost]
     public async Task<IActionResult> ImportData(IFormFile file, CancellationToken cancellationToken)
     {
+        List<TransactionEntity> transactions;
         await using (var stream = file.OpenReadStream())
         {
-            await _transactionService.SaveDbFromCsvAsync(stream, cancellationToken);
+            transactions = await _fileConversionService.ReadCsvFileAsync(stream, cancellationToken);
         }
+
+        await _transactionService.SaveToDbAsync(transactions, cancellationToken);
         
         return Ok();
     }
@@ -29,7 +34,7 @@ public class TransactionController(ITransactionService transactionService) : Con
         return Ok(transactions);
     }
     
-    [HttpGet]
+    [HttpGet("clients")]
     public async Task<IActionResult> GetTransactionsByClientDates([FromQuery]DateTime dateFrom, [FromQuery]DateTime dateTo, CancellationToken cancellationToken)
     {
         var transactions = await _transactionService.GetTransactionsByClientDatesAsync(dateFrom, dateTo, cancellationToken);
@@ -37,16 +42,20 @@ public class TransactionController(ITransactionService transactionService) : Con
     }
     
     
-    [HttpGet]
+    [HttpGet("export")]
     public async Task<IActionResult> ExportTransactionsByDates([FromQuery]DateTime dateFrom, [FromQuery]DateTime dateTo, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var transactions = await _transactionService.GetTransactionsByDatesAsync(dateFrom, dateTo, cancellationToken);
+        var xlsx = await _fileConversionService.ConvertToExcelAsync(transactions, cancellationToken);
+        return File(xlsx, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "transactions.xlsx");
     }
     
-    [HttpGet]
+    [HttpGet("export/clients")]
     public async Task<IActionResult> ExportTransactionsByClientDates([FromQuery]DateTime dateFrom, [FromQuery]DateTime dateTo, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
+        var transactions = await _transactionService.GetTransactionsByClientDatesAsync(dateFrom, dateTo, cancellationToken);
+        var xlsx = await _fileConversionService.ConvertToExcelAsync(transactions, cancellationToken);
+        return File(xlsx, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "transactions.xlsx");
     }
     
 }
