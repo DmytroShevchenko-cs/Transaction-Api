@@ -59,15 +59,7 @@ public class TransactionService(IOptions<DbConnection> connectionString, IGeoloc
 
         return transactions;
     }
-
-    /// <summary>
-    /// Returns file with Transactions
-    /// </summary>
-    public Task ExportExelAsync(CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
+    
     /// <summary>
     /// Returns list of Transactions by dates
     /// </summary>
