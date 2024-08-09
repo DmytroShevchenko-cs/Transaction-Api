@@ -1,5 +1,9 @@
+using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerUI;
 using TransactionApi.Model;
+using TransactionApi.Service.Options;
 using TransactionApi.Service.Services;
 using TransactionApi.Service.Services.Interfaces;
 
@@ -20,7 +24,30 @@ public class Startup
 
         services.AddDbContext<TransactionDbContext>(options =>
             options.UseSqlServer(connectionString));
+
+        services.AddTransient<ITransactionService, TransactionService>();
+        services.AddTransient<IGeolocationApiService, GeolocationApiService>();
+        services.AddTransient<IFileConversionService, FileConversionService>();
         
+        services.Configure<TimeZoneApiOption>(Configuration.GetSection("TimeZoneApiOption"));
+        services.Configure<DbConnection>(Configuration.GetSection("ConnectionStrings"));
+        services.AddTransient<HttpClient>();
+        
+        services.AddControllers();
+        services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "Transaction API",
+                Version = "v1",
+                Description = "API for transactions"
+            });
+
+            // Включаем XML-комментарии
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            c.IncludeXmlComments(xmlPath);
+        });
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -29,15 +56,30 @@ public class Startup
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Transaction API V1");
+            });
         }
         else
         {
             app.UseExceptionHandler("/Error");
             app.UseHsts();
         }
-        
+
         app.UseRouting();
+        app.UseCors(b => b.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+        
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.UseStaticFiles();
+        
+        
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
     }
 
 }
