@@ -55,9 +55,9 @@ public class TransactionController(ITransactionService transactionService, IFile
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
     /// <returns>Returns a list of client transactions within the specified date range.</returns>
     [HttpGet("clients")]
-    public async Task<IActionResult> GetTransactionsByClientDates([FromQuery]DateTime dateFrom, [FromQuery]DateTime dateTo, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetTransactionsByUserDates([FromQuery]DateTime dateFrom, [FromQuery]DateTime dateTo, CancellationToken cancellationToken)
     {
-        var transactions = await _transactionService.GetTransactionsByClientDatesAsync(dateFrom, dateTo, cancellationToken);
+        var transactions = await _transactionService.GetTransactionsByUserDatesAsync(dateFrom, dateTo, cancellationToken);
         return Ok(transactions);
     }
     
@@ -84,9 +84,9 @@ public class TransactionController(ITransactionService transactionService, IFile
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
     /// <returns>Returns an Excel file with transactions within the specified date range.</returns>
     [HttpGet("export/clients")]
-    public async Task<IActionResult> ExportTransactionsByClientDates([FromQuery]DateTime dateFrom, [FromQuery]DateTime dateTo, CancellationToken cancellationToken)
+    public async Task<IActionResult> ExportTransactionsByUserDates([FromQuery]DateTime dateFrom, [FromQuery]DateTime dateTo, CancellationToken cancellationToken)
     {
-        var transactions = await _transactionService.GetTransactionsByClientDatesAsync(dateFrom, dateTo, cancellationToken);
+        var transactions = await _transactionService.GetTransactionsByUserDatesAsync(dateFrom, dateTo, cancellationToken);
         var xlsx = await _fileConversionService.ConvertToExcelAsync(transactions, cancellationToken);
         return File(xlsx, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "transactions.xlsx");
     }
@@ -99,7 +99,7 @@ public class TransactionController(ITransactionService transactionService, IFile
     [HttpGet("january/clients")]
     public async Task<IActionResult> GetJanuaryTransactions(CancellationToken cancellationToken)
     {
-        var transactions = await _transactionService.GetTransactionsByClientDatesAsync(DateTime.Parse("2024-01-01 00:00:00"), DateTime.Parse("2024-01-31 00:00:00"), cancellationToken);
+        var transactions = await _transactionService.GetTransactionsByDatesAsync(DateTime.Parse("2024-01-01 00:00:00"), DateTime.Parse("2024-01-31 00:00:00"), cancellationToken);
         return Ok(transactions);
     }
     
@@ -111,7 +111,7 @@ public class TransactionController(ITransactionService transactionService, IFile
     [HttpGet("export/january/clients")]
     public async Task<IActionResult> ExportJanuaryTransactions(CancellationToken cancellationToken)
     {
-        var transactions = await _transactionService.GetTransactionsByClientDatesAsync(DateTime.Parse("2024-01-01 00:00:00"), DateTime.Parse("2024-01-31 00:00:00"), cancellationToken);
+        var transactions = await _transactionService.GetTransactionsByDatesAsync(DateTime.Parse("2024-01-01 00:00:00"), DateTime.Parse("2024-01-31 00:00:00"), cancellationToken);
         var xlsx = await _fileConversionService.ConvertToExcelAsync(transactions, cancellationToken);
         return File(xlsx, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "transactions.xlsx");
     }

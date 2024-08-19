@@ -11,6 +11,6 @@ public interface ITransactionService
     Task<List<TransactionEntity>> GetTransactionsByDatesAsync(DateTime from, DateTime to, 
         CancellationToken cancellationToken = default);
     
-    Task<List<TransactionEntity>> GetTransactionsByClientDatesAsync(DateTime from, DateTime to,
+    Task<List<TransactionEntity>> GetTransactionsByUserDatesAsync(DateTime from, DateTime to,
         CancellationToken cancellationToken = default);
 }

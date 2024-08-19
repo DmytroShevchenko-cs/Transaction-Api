@@ -88,9 +88,9 @@ public class TransactionService(IOptions<DbConnection> connectionString, IGeoloc
     }
 
     /// <summary>
-    /// Returns list of Transactions by dates and client time zone
+    /// Returns list of Transactions by dates with including user's time zone
     /// </summary>
-    public async Task<List<TransactionEntity>> GetTransactionsByClientDatesAsync(DateTime from, DateTime to,
+    public async Task<List<TransactionEntity>> GetTransactionsByUserDatesAsync(DateTime from, DateTime to,
         CancellationToken cancellationToken = default)
     {
         var userCoordinates = await geolocationApiService.GetClientTimeZone(cancellationToken);

@@ -77,7 +77,7 @@ public class TransactionServiceTest : DefaultServiceTest<ITransactionService, Tr
     [TestCase("2024-05-01 00:00:00", "2024-07-10 00:00:00")]
     public async Task GetTransactionByDatesWithLocation(DateTime dateTimeFrom, DateTime dateTimeTo)
     {
-        var transactions = await Service.GetTransactionsByClientDatesAsync(dateTimeFrom, dateTimeTo);
+        var transactions = await Service.GetTransactionsByUserDatesAsync(dateTimeFrom, dateTimeTo);
         Assert.That(!transactions.Any(r => r.TransactionDate < dateTimeFrom.AddHours(-26) &&  r.TransactionDate > dateTimeTo.AddHours(26)));
     } 
 }
