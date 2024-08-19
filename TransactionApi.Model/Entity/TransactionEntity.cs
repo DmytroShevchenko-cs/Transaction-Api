@@ -8,4 +8,6 @@ public class TransactionEntity
     public decimal Amount { get; set; }
     public DateTime TransactionDate { get; set; }
     public string ClientLocation { get; set; } = null!;
+    
+    public string TimeZone { get; set; } = null!;
 }

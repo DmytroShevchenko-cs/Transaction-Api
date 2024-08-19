@@ -43,7 +43,7 @@ public class Startup
                 Description = "API for transactions"
             });
 
-            // Включаем XML-комментарии
+            // XML-comment
             var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
             var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             c.IncludeXmlComments(xmlPath);

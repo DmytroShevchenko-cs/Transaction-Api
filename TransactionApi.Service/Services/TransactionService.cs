@@ -8,7 +8,7 @@ using TransactionApi.Service.Services.Interfaces;
 
 namespace TransactionApi.Service.Services;
 
-public class TransactionService(IOptions<DbConnection> connectionString, IGeolocationApiService geolocationApiService, IFileConversionService fileConversionService)
+public class TransactionService(IOptions<DbConnection> connectionString, IGeolocationApiService geolocationApiService)
     : ITransactionService
 {
     private readonly string _connectionString = connectionString.Value.ConnectionString;
@@ -19,6 +19,13 @@ public class TransactionService(IOptions<DbConnection> connectionString, IGeoloc
     public async Task<IEnumerable<TransactionEntity>> SaveToDbAsync(List<TransactionEntity> transactions,
         CancellationToken cancellationToken = default)
     {
+
+        foreach (var transaction in transactions)
+        {
+            transaction.TimeZone =
+                await geolocationApiService.GetTimeZoneByLocation(transaction.ClientLocation, cancellationToken);
+        }
+        
         await using (var connection = new SqlConnection(_connectionString))
         {
             await connection.OpenAsync(cancellationToken);
@@ -30,17 +37,18 @@ public class TransactionService(IOptions<DbConnection> connectionString, IGeoloc
                     {
                         var query = @"
                             MERGE INTO Transactions AS target
-                            USING (VALUES (@TransactionId, @Name, @Email, @Amount, @TransactionDate, @ClientLocation)) AS source (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation)
+                            USING (VALUES (@TransactionId, @Name, @Email, @Amount, @TransactionDate, @ClientLocation, @TimeZone)) AS source (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation, TimeZone)
                             ON target.TransactionId = source.TransactionId
                             WHEN MATCHED THEN
                                 UPDATE SET Name = source.Name,
                                            Email = source.Email,
                                            Amount = source.Amount,
                                            TransactionDate = source.TransactionDate,
-                                           ClientLocation = source.ClientLocation
+                                           ClientLocation = source.ClientLocation,
+                                           TimeZone = source.TimeZone
                             WHEN NOT MATCHED THEN
-                                INSERT (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation)
-                                VALUES (source.TransactionId, source.Name, source.Email, source.Amount, source.TransactionDate, source.ClientLocation);";
+                                INSERT (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation, TimeZone)
+                                VALUES (source.TransactionId, source.Name, source.Email, source.Amount, source.TransactionDate, source.ClientLocation, source.TimeZone);";
 
 
                         await connection.ExecuteAsync(query, record, transaction: transaction,
