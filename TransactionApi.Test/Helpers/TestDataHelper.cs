@@ -15,7 +15,8 @@ public static class TestDataHelper
                 Email = "john.doe@example.com",
                 Amount = 100.0m,
                 TransactionDate = DateTime.Parse("2023-12-30 23:50:00"),
-                ClientLocation = "40.712776, -74.005974" // New York
+                ClientLocation = "40.712776, -74.005974", // New York
+                TimeZone = "America/New_York"
             },
             new ()
             {
@@ -24,7 +25,8 @@ public static class TestDataHelper
                 Email = "jane.smith@example.com",
                 Amount = 200.0m,
                 TransactionDate = DateTime.Parse("2023-12-31 00:00:00"),
-                ClientLocation = "34.052235, -118.243683" // Los Angeles
+                ClientLocation = "34.052235, -118.243683", // Los Angeles
+                TimeZone = "America/Los_Angeles"
             },
             new ()
             {
@@ -33,7 +35,8 @@ public static class TestDataHelper
                 Email = "alice.johnson@example.com",
                 Amount = 150.0m,
                 TransactionDate = DateTime.Parse("2024-01-01 00:00:00"),
-                ClientLocation = "51.507351, -0.127758" // London
+                ClientLocation = "51.507351, -0.127758", // London
+                TimeZone = "Europe/London"
             },
             new ()
             {
@@ -42,7 +45,8 @@ public static class TestDataHelper
                 Email = "bob.brown@example.com",
                 Amount = 175.0m,
                 TransactionDate = DateTime.Parse("2024-01-02 00:00:00"),
-                ClientLocation = "48.856613, 2.352222" // Paris
+                ClientLocation = "48.856613, 2.352222", // Paris
+                TimeZone = "Europe/Paris"
             },
             new ()
             {
@@ -51,7 +55,8 @@ public static class TestDataHelper
                 Email = "charlie.davis@example.com",
                 Amount = 300.0m,
                 TransactionDate = DateTime.Parse("2024-01-02 12:00:00"),
-                ClientLocation = "35.689487, 139.691711" // Tokyo
+                ClientLocation = "35.689487, 139.691711", // Tokyo
+                TimeZone = "Asia/Tokyo"
             },
             new ()
             {
@@ -60,7 +65,8 @@ public static class TestDataHelper
                 Email = "diana.evans@example.com",
                 Amount = 400.0m,
                 TransactionDate = DateTime.Parse("2024-01-03 00:00:00"),
-                ClientLocation = "55.755825, 37.617298" // Moscow
+                ClientLocation = "55.755825, 37.617298", // Moscow
+                TimeZone = "Europe/Moscow"
             },
             new ()
             {
@@ -69,7 +75,8 @@ public static class TestDataHelper
                 Email = "evan.foster@example.com",
                 Amount = 250.0m,
                 TransactionDate = DateTime.Parse("2024-01-04 00:00:00"),
-                ClientLocation = "40.730610, -73.935242" // New York
+                ClientLocation = "40.730610, -73.935242", // New York
+                TimeZone = "America/New_York"
             },
             new ()
             {
@@ -78,7 +85,8 @@ public static class TestDataHelper
                 Email = "fiona.green@example.com",
                 Amount = 320.0m,
                 TransactionDate = DateTime.Parse("2024-01-05 00:00:00"),
-                ClientLocation = "34.052235, -118.243683" // Los Angeles
+                ClientLocation = "34.052235, -118.243683", // Los Angeles
+                TimeZone = "America/Los_Angeles"
             },
             new ()
             {
@@ -87,7 +95,8 @@ public static class TestDataHelper
                 Email = "george.harris@example.com",
                 Amount = 150.0m,
                 TransactionDate = DateTime.Parse("2024-01-06 00:00:00"),
-                ClientLocation = "51.507351, -0.127758" // London
+                ClientLocation = "51.507351, -0.127758", // London
+                TimeZone = "Europe/London"
             },
             new ()
             {
@@ -96,7 +105,8 @@ public static class TestDataHelper
                 Email = "hannah.white@example.com",
                 Amount = 280.0m,
                 TransactionDate = DateTime.Parse("2024-01-30 12:30:00"),
-                ClientLocation = "48.856613, 2.352222" // Paris
+                ClientLocation = "48.856613, 2.352222", // Paris
+                TimeZone = "Europe/Paris"
             },
             new ()
             {
@@ -105,7 +115,8 @@ public static class TestDataHelper
                 Email = "ian.king@example.com",
                 Amount = 350.0m,
                 TransactionDate = DateTime.Parse("2024-01-30 23:30:00"),
-                ClientLocation = "35.689487, 139.691711" // Tokyo
+                ClientLocation = "35.689487, 139.691711", // Tokyo
+                TimeZone = "Asia/Tokyo"
             },
             new ()
             {
@@ -114,7 +125,8 @@ public static class TestDataHelper
                 Email = "jack.lee@example.com",
                 Amount = 410.0m,
                 TransactionDate = DateTime.Parse("2024-01-31 00:00:00"),
-                ClientLocation = "55.755825, 37.617298" // Moscow
+                ClientLocation = "55.755825, 37.617298", // Moscow
+                TimeZone = "Europe/Moscow"
             },
             new ()
             {
@@ -123,7 +135,8 @@ public static class TestDataHelper
                 Email = "karen.moore@example.com",
                 Amount = 290.0m,
                 TransactionDate = DateTime.Parse("2024-02-01 00:00:00"),
-                ClientLocation = "40.730610, -73.935242" // New York
+                ClientLocation = "40.730610, -73.935242", // New York
+                TimeZone = "America/New_York"
             },
             new ()
             {
@@ -132,7 +145,8 @@ public static class TestDataHelper
                 Email = "liam.nelson@example.com",
                 Amount = 330.0m,
                 TransactionDate = DateTime.Parse("2024-02-02 00:00:00"),
-                ClientLocation = "34.052235, -118.243683" // Los Angeles
+                ClientLocation = "34.052235, -118.243683", // Los Angeles
+                TimeZone = "America/Los_Angeles"
             },
             new ()
             {
@@ -141,7 +155,8 @@ public static class TestDataHelper
                 Email = "mia.parker@example.com",
                 Amount = 180.0m,
                 TransactionDate = DateTime.Parse("2024-02-02 03:00:00"),
-                ClientLocation = "51.507351, -0.127758" // London
+                ClientLocation = "51.507351, -0.127758", // London
+                TimeZone = "Europe/London"
             },
             new ()
             {
@@ -150,7 +165,8 @@ public static class TestDataHelper
                 Email = "mia.parker@example.com",
                 Amount = 180.0m,
                 TransactionDate = DateTime.Parse("2024-05-02 03:00:00"),
-                ClientLocation = "51.507351, -0.127758" 
+                ClientLocation = "51.507351, -0.127758",
+                TimeZone = "Europe/London"
             },
             new ()
             {
@@ -159,7 +175,8 @@ public static class TestDataHelper
                 Email = "mia.parker@example.com",
                 Amount = 180.0m,
                 TransactionDate = DateTime.Parse("2024-05-19 03:00:00"),
-                ClientLocation = "34.052235, -118.243683" 
+                ClientLocation = "34.052235, -118.243683", 
+                TimeZone = "America/Los_Angeles"
             },
             new ()
             {
@@ -168,7 +185,8 @@ public static class TestDataHelper
                 Email = "mia.parker@example.com",
                 Amount = 180.0m,
                 TransactionDate = DateTime.Parse("2024-06-12 03:00:00"),
-                ClientLocation = "40.730610, -73.935242" 
+                ClientLocation = "40.730610, -73.935242",
+                TimeZone = "America/New_York"
             },
             new ()
             {
@@ -177,7 +195,8 @@ public static class TestDataHelper
                 Email = "mia.parker@example.com",
                 Amount = 180.0m,
                 TransactionDate = DateTime.Parse("2024-06-30 03:00:00"),
-                ClientLocation = "55.755825, 37.617298" 
+                ClientLocation = "55.755825, 37.617298",
+                TimeZone = "Europe/Moscow"
             },
             new ()
             {
@@ -186,7 +205,8 @@ public static class TestDataHelper
                 Email = "mia.parker@example.com",
                 Amount = 180.0m,
                 TransactionDate = DateTime.Parse("2024-06-27 03:00:00"),
-                ClientLocation = "51.507351, -0.127758" 
+                ClientLocation = "51.507351, -0.127758", 
+                TimeZone = "Europe/London"
             },
             new ()
             {
@@ -195,7 +215,8 @@ public static class TestDataHelper
                 Email = "mia.parker@example.com",
                 Amount = 180.0m,
                 TransactionDate = DateTime.Parse("2024-05-12 03:00:00"),
-                ClientLocation = "5.689487, 139.691711" 
+                ClientLocation = "5.689487, 139.691711",
+                TimeZone = "Asia/Tokyo"
             },
             new ()
             {
@@ -204,7 +225,8 @@ public static class TestDataHelper
                 Email = "mia.parker@example.com",
                 Amount = 180.0m,
                 TransactionDate = DateTime.Parse("2024-07-21 03:00:00"),
-                ClientLocation = "48.856613, 2.352222" 
+                ClientLocation = "48.856613, 2.352222",
+                TimeZone = "Europe/Paris"
             },
             new ()
             {
@@ -213,7 +235,8 @@ public static class TestDataHelper
                 Email = "mia.parker@example.com",
                 Amount = 180.0m,
                 TransactionDate = DateTime.Parse("2024-08-15 03:00:00"),
-                ClientLocation = "34.052235, -118.243683"
+                ClientLocation = "34.052235, -118.243683",
+                TimeZone = "America/Los_Angeles"
             },
             new ()
             {
@@ -222,7 +245,8 @@ public static class TestDataHelper
                 Email = "mia.parker@example.com",
                 Amount = 180.0m,
                 TransactionDate = DateTime.Parse("2024-07-01 03:00:00"),
-                ClientLocation = "55.755825, 37.617298"
+                ClientLocation = "55.755825, 37.617298",
+                TimeZone = "Europe/Moscow"
             },
             new ()
             {
@@ -231,7 +255,8 @@ public static class TestDataHelper
                 Email = "mia.parker@example.com",
                 Amount = 180.0m,
                 TransactionDate = DateTime.Parse("2024-06-11 03:00:00"),
-                ClientLocation = "5.689487, 139.691711" 
+                ClientLocation = "5.689487, 139.691711",
+                TimeZone = "Asia/Tokyo"
             },
         };
     }

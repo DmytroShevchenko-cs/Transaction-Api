@@ -6,6 +6,9 @@ public class CoordinatesResponse
 {
     [JsonProperty("geo")]
     public Geo Geo { get; set; } = null!;
+    
+    [JsonProperty("timezone")]
+    public string Timezone { get; set; } = null!;
 }
 public class Geo
 {

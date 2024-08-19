@@ -2,6 +2,8 @@ using System.Data;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
+using NodaTime;
+using NodaTime.Extensions;
 using TransactionApi.Model.Entity;
 using TransactionApi.Service.Options;
 using TransactionApi.Service.Services.Interfaces;
@@ -92,36 +94,55 @@ public class TransactionService(IOptions<DbConnection> connectionString, IGeoloc
         CancellationToken cancellationToken = default)
     {
         var userCoordinates = await geolocationApiService.GetClientTimeZone(cancellationToken);
+        var userTimeZone = DateTimeZoneProviders.Tzdb[userCoordinates];
         
         //for include date in query to db
         to = to.AddDays(1);
         
+        var fromLocal = LocalDateTime.FromDateTime(from).InZoneLeniently(userTimeZone);
+        var toLocal = LocalDateTime.FromDateTime(to.AddDays(1)).InZoneLeniently(userTimeZone);
+    
+        // Convert the LocalDateTime to UTC for querying the database
+        var fromUtc = fromLocal.ToInstant().ToDateTimeUtc();
+        var toUtc = toLocal.ToInstant().ToDateTimeUtc();
+        
         await using (var connection = new SqlConnection(_connectionString))
         {
             var query = @"
-                SELECT * FROM Transactions
-                WHERE TransactionDate BETWEEN @From AND @To";
-
-            // 26 is max time difference in the world
-            var transactions =
-                (await connection.QueryAsync<TransactionEntity>(query,
-                    new { From = from.AddHours(-26), To = to.AddHours(26) })).ToList();
-
-            var filteredTransactions = transactions.Where(r =>
-                r.TransactionDate >= from.AddHours(26) && r.TransactionDate <= to.AddHours(-26)).ToList();
-
+            SELECT * FROM Transactions
+            WHERE TransactionDate BETWEEN @From AND @To";
+    
+            var transactions = (await connection.QueryAsync<TransactionEntity>(query,
+                new { From = fromUtc, To = toUtc })).ToList();
+            
+            var filteredTransactions = transactions.Where(transaction =>
+            {
+                var transactionTimeZone = DateTimeZoneProviders.Tzdb[transaction.TimeZone];
+                var transactionZonedDateTime = LocalDateTime.FromDateTime(transaction.TransactionDate)
+                    .InZoneLeniently(transactionTimeZone);
+    
+                // Convert the transaction time to the user's time zone
+                var convertedDateTime = transactionZonedDateTime.WithZone(userTimeZone);
+    
+                // Check if the converted transaction time falls within the user's specified range
+                return convertedDateTime.ToDateTimeUnspecified() >= from 
+                       && convertedDateTime.ToDateTimeUnspecified() < to;
+            }).ToList();
+            
             foreach (var transaction in transactions.Except(filteredTransactions))
             {
-                var clientTransactionDate = await geolocationApiService.ConvertTimeByCoordinatesAsync(
-                    transaction.ClientLocation,
-                    userCoordinates, transaction.TransactionDate, cancellationToken);
-
-                if (clientTransactionDate >= from && clientTransactionDate <= to)
+                var transactionTimeZone = DateTimeZoneProviders.Tzdb[transaction.TimeZone];
+                var dateTime = transaction.TransactionDate.ToLocalDateTime();
+                
+                var transactionZonedDateTime = dateTime.InZoneLeniently(transactionTimeZone);
+                var convertedDateTime = transactionZonedDateTime.WithZone(userTimeZone);
+                
+                if (convertedDateTime.ToDateTimeUtc() >= from && convertedDateTime.ToDateTimeUtc() <= to)
                 {
                     filteredTransactions.Add(transaction);
                 }
             }
-
+    
             return filteredTransactions;
         }
     }

@@ -36,15 +36,16 @@ public class TransactionServiceTest : DefaultServiceTest<ITransactionService, Tr
                     Email NVARCHAR(100),
                     Amount DECIMAL(18, 2),
                     TransactionDate DATETIME,
-                    ClientLocation NVARCHAR(100)
+                    ClientLocation NVARCHAR(100),
+                    TimeZone NVARCHAR(100)
                 )");
             
             var testData = TestDataHelper.CreateTestData();
             foreach (var transaction in testData)
             {
                 var query = @"
-                    INSERT INTO Transactions (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation)
-                    VALUES (@TransactionId, @Name, @Email, @Amount, @TransactionDate, @ClientLocation)";
+                    INSERT INTO Transactions (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation, TimeZone)
+                    VALUES (@TransactionId, @Name, @Email, @Amount, @TransactionDate, @ClientLocation, @TimeZone)";
 
                 await connection.ExecuteAsync(query, transaction);
             }
@@ -69,6 +70,7 @@ public class TransactionServiceTest : DefaultServiceTest<ITransactionService, Tr
         var transactions = await Service.GetTransactionsByDatesAsync(dateTimeFrom, dateTimeTo);
         Assert.That(!transactions.Any(r => r.TransactionDate < dateTimeFrom &&  r.TransactionDate > dateTimeTo));
     } 
+    
     [Test]
     [TestCase("2024-01-01 00:00:00", "2024-01-31 00:00:00")]// for january 2024
     [TestCase("2024-01-01 00:00:00", "2024-01-03 00:00:00")]

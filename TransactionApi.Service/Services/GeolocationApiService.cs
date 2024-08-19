@@ -50,7 +50,7 @@ public class GeolocationApiService(IOptions<TimeZoneApiOption> apiOption, HttpCl
         if (data is null)
             throw new Exception("Response error");
         
-        return data.Geo.ToString();
+        return data.Timezone;
     }
     
     /// <summary>

@@ -11,7 +11,7 @@ public class GeolocationApiServiceTest : DefaultServiceTest<IGeolocationApiServi
 {
     
     [Test]
-    [TestCase("50.12999, 30.65707")]
+    [TestCase("Europe/Kyiv")]
     public async Task GetClientTimeZone_GetTimeZoneName_Success(string coordinates)
     {
         var resultTimeZone = await Service.GetClientTimeZone();
