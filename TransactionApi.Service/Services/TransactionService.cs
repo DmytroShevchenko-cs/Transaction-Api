@@ -2,13 +2,15 @@ using System.Data;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
+using NodaTime;
+using NodaTime.Extensions;
 using TransactionApi.Model.Entity;
 using TransactionApi.Service.Options;
 using TransactionApi.Service.Services.Interfaces;
 
 namespace TransactionApi.Service.Services;
 
-public class TransactionService(IOptions<DbConnection> connectionString, IGeolocationApiService geolocationApiService, IFileConversionService fileConversionService)
+public class TransactionService(IOptions<DbConnection> connectionString, IGeolocationApiService geolocationApiService)
     : ITransactionService
 {
     private readonly string _connectionString = connectionString.Value.ConnectionString;
@@ -19,6 +21,13 @@ public class TransactionService(IOptions<DbConnection> connectionString, IGeoloc
     public async Task<IEnumerable<TransactionEntity>> SaveToDbAsync(List<TransactionEntity> transactions,
         CancellationToken cancellationToken = default)
     {
+
+        foreach (var transaction in transactions)
+        {
+            transaction.TimeZone =
+                await geolocationApiService.GetTimeZoneByLocation(transaction.ClientLocation, cancellationToken);
+        }
+        
         await using (var connection = new SqlConnection(_connectionString))
         {
             await connection.OpenAsync(cancellationToken);
@@ -30,17 +39,18 @@ public class TransactionService(IOptions<DbConnection> connectionString, IGeoloc
                     {
                         var query = @"
                             MERGE INTO Transactions AS target
-                            USING (VALUES (@TransactionId, @Name, @Email, @Amount, @TransactionDate, @ClientLocation)) AS source (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation)
+                            USING (VALUES (@TransactionId, @Name, @Email, @Amount, @TransactionDate, @ClientLocation, @TimeZone)) AS source (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation, TimeZone)
                             ON target.TransactionId = source.TransactionId
                             WHEN MATCHED THEN
                                 UPDATE SET Name = source.Name,
                                            Email = source.Email,
                                            Amount = source.Amount,
                                            TransactionDate = source.TransactionDate,
-                                           ClientLocation = source.ClientLocation
+                                           ClientLocation = source.ClientLocation,
+                                           TimeZone = source.TimeZone
                             WHEN NOT MATCHED THEN
-                                INSERT (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation)
-                                VALUES (source.TransactionId, source.Name, source.Email, source.Amount, source.TransactionDate, source.ClientLocation);";
+                                INSERT (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation, TimeZone)
+                                VALUES (source.TransactionId, source.Name, source.Email, source.Amount, source.TransactionDate, source.ClientLocation, source.TimeZone);";
 
 
                         await connection.ExecuteAsync(query, record, transaction: transaction,
@@ -84,36 +94,55 @@ public class TransactionService(IOptions<DbConnection> connectionString, IGeoloc
         CancellationToken cancellationToken = default)
     {
         var userCoordinates = await geolocationApiService.GetClientTimeZone(cancellationToken);
+        var userTimeZone = DateTimeZoneProviders.Tzdb[userCoordinates];
         
         //for include date in query to db
         to = to.AddDays(1);
         
+        var fromLocal = LocalDateTime.FromDateTime(from).InZoneLeniently(userTimeZone);
+        var toLocal = LocalDateTime.FromDateTime(to.AddDays(1)).InZoneLeniently(userTimeZone);
+    
+        // Convert the LocalDateTime to UTC for querying the database
+        var fromUtc = fromLocal.ToInstant().ToDateTimeUtc();
+        var toUtc = toLocal.ToInstant().ToDateTimeUtc();
+        
         await using (var connection = new SqlConnection(_connectionString))
         {
             var query = @"
-                SELECT * FROM Transactions
-                WHERE TransactionDate BETWEEN @From AND @To";
-
-            // 26 is max time difference in the world
-            var transactions =
-                (await connection.QueryAsync<TransactionEntity>(query,
-                    new { From = from.AddHours(-26), To = to.AddHours(26) })).ToList();
-
-            var filteredTransactions = transactions.Where(r =>
-                r.TransactionDate >= from.AddHours(26) && r.TransactionDate <= to.AddHours(-26)).ToList();
-
+            SELECT * FROM Transactions
+            WHERE TransactionDate BETWEEN @From AND @To";
+    
+            var transactions = (await connection.QueryAsync<TransactionEntity>(query,
+                new { From = fromUtc, To = toUtc })).ToList();
+            
+            var filteredTransactions = transactions.Where(transaction =>
+            {
+                var transactionTimeZone = DateTimeZoneProviders.Tzdb[transaction.TimeZone];
+                var transactionZonedDateTime = LocalDateTime.FromDateTime(transaction.TransactionDate)
+                    .InZoneLeniently(transactionTimeZone);
+    
+                // Convert the transaction time to the user's time zone
+                var convertedDateTime = transactionZonedDateTime.WithZone(userTimeZone);
+    
+                // Check if the converted transaction time falls within the user's specified range
+                return convertedDateTime.ToDateTimeUnspecified() >= from 
+                       && convertedDateTime.ToDateTimeUnspecified() < to;
+            }).ToList();
+            
             foreach (var transaction in transactions.Except(filteredTransactions))
             {
-                var clientTransactionDate = await geolocationApiService.ConvertTimeByCoordinatesAsync(
-                    transaction.ClientLocation,
-                    userCoordinates, transaction.TransactionDate, cancellationToken);
-
-                if (clientTransactionDate >= from && clientTransactionDate <= to)
+                var transactionTimeZone = DateTimeZoneProviders.Tzdb[transaction.TimeZone];
+                var dateTime = transaction.TransactionDate.ToLocalDateTime();
+                
+                var transactionZonedDateTime = dateTime.InZoneLeniently(transactionTimeZone);
+                var convertedDateTime = transactionZonedDateTime.WithZone(userTimeZone);
+                
+                if (convertedDateTime.ToDateTimeUtc() >= from && convertedDateTime.ToDateTimeUtc() <= to)
                 {
                     filteredTransactions.Add(transaction);
                 }
             }
-
+    
             return filteredTransactions;
         }
     }

@@ -13,7 +13,29 @@ public class GeolocationApiService(IOptions<TimeZoneApiOption> apiOption, HttpCl
 {
     private readonly TimeZoneApiOption _apiOption = apiOption.Value;
     private readonly HttpClient _httpClient = httpClient;
-    
+
+    /// <summary>
+    /// Returns timezone using location coordinates
+    /// </summary>
+    public async Task<string> GetTimeZoneByLocation(string clientLocation, CancellationToken cancellationToken = default)
+    {
+        var url = new StringBuilder(_apiOption.BaseUrl);
+        
+        var coords = clientLocation.Split(",", StringSplitOptions.TrimEntries);
+        
+        if (coords.Length != 2)
+            throw new Exception("Error with coordinates format");
+        url.Append($"?apiKey={_apiOption.ApiKey}&lat={coords[0]}&long={coords[1]}");
+        
+        var response = await _httpClient.GetStringAsync(url.ToString(), cancellationToken);
+        
+        var data = JsonConvert.DeserializeObject<TimeZoneResponse>(response);
+        if (data is null)
+            throw new Exception("Response error");
+        
+        return data.Timezone;
+    }
+
     /// <summary>
     /// Returns user`s timezone
     /// </summary>
@@ -28,7 +50,7 @@ public class GeolocationApiService(IOptions<TimeZoneApiOption> apiOption, HttpCl
         if (data is null)
             throw new Exception("Response error");
         
-        return data.Geo.ToString();
+        return data.Timezone;
     }
     
     /// <summary>

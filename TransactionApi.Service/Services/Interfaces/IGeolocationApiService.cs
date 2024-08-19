@@ -4,7 +4,7 @@ namespace TransactionApi.Service.Services.Interfaces;
 
 public interface IGeolocationApiService
 {
-    // Task<string> GetTimeZoneByLocation(string latitude, string longitude, CancellationToken cancellationToken = default);
+    Task<string> GetTimeZoneByLocation(string clientLocation, CancellationToken cancellationToken = default);
     
     Task<string> GetClientTimeZone(CancellationToken cancellationToken = default);
 
