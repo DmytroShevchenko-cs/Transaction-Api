@@ -25,9 +25,9 @@ public class Startup
         services.AddDbContext<TransactionDbContext>(options =>
             options.UseSqlServer(connectionString));
 
-        services.AddTransient<ITransactionService, TransactionService>();
-        services.AddTransient<IGeolocationApiService, GeolocationApiService>();
-        services.AddTransient<IFileConversionService, FileConversionService>();
+        services.AddScoped<ITransactionService, TransactionService>();
+        services.AddScoped<IGeolocationApiService, GeolocationApiService>();
+        services.AddScoped<IFileConversionService, FileConversionService>();
         
         services.Configure<TimeZoneApiOption>(Configuration.GetSection("TimeZoneApiOption"));
         services.Configure<DbConnection>(Configuration.GetSection("ConnectionStrings"));
@@ -70,11 +70,6 @@ public class Startup
 
         app.UseRouting();
         app.UseCors(b => b.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-        
-        app.UseAuthentication();
-        app.UseAuthorization();
-        app.UseStaticFiles();
-        
         
         app.UseEndpoints(endpoints =>
         {
