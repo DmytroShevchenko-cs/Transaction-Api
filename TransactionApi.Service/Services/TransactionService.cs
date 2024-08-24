@@ -26,6 +26,10 @@ public class TransactionService(IOptions<DbConnection> connectionString, IGeoloc
         {
             transaction.TimeZone =
                 await geolocationApiService.GetTimeZoneByLocation(transaction.ClientLocation, cancellationToken);
+            
+            DateTimeZone timeZone = DateTimeZoneProviders.Tzdb[transaction.TimeZone];
+            ZonedDateTime zonedDateTime = transaction.TransactionDate.ToLocalDateTime().InZoneLeniently(timeZone);
+            transaction.DateTimeUtc = zonedDateTime.ToDateTimeUtc();
         }
         
         await using (var connection = new SqlConnection(_connectionString))
@@ -39,7 +43,8 @@ public class TransactionService(IOptions<DbConnection> connectionString, IGeoloc
                     {
                         var query = @"
                             MERGE INTO Transactions AS target
-                            USING (VALUES (@TransactionId, @Name, @Email, @Amount, @TransactionDate, @ClientLocation, @TimeZone)) AS source (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation, TimeZone)
+                            USING (VALUES (@TransactionId, @Name, @Email, @Amount, @TransactionDate, @ClientLocation, @TimeZone, @DateTimeUtc)) 
+                            AS source (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation, TimeZone, DateTimeUtc)
                             ON target.TransactionId = source.TransactionId
                             WHEN MATCHED THEN
                                 UPDATE SET Name = source.Name,
@@ -47,10 +52,11 @@ public class TransactionService(IOptions<DbConnection> connectionString, IGeoloc
                                            Amount = source.Amount,
                                            TransactionDate = source.TransactionDate,
                                            ClientLocation = source.ClientLocation,
-                                           TimeZone = source.TimeZone
+                                           TimeZone = source.TimeZone,
+                                           DateTimeUtc = source.DateTimeUtc
                             WHEN NOT MATCHED THEN
-                                INSERT (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation, TimeZone)
-                                VALUES (source.TransactionId, source.Name, source.Email, source.Amount, source.TransactionDate, source.ClientLocation, source.TimeZone);";
+                                INSERT (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation, TimeZone, DateTimeUtc)
+                                VALUES (source.TransactionId, source.Name, source.Email, source.Amount, source.TransactionDate, source.ClientLocation, source.TimeZone, source.DateTimeUtc);";
 
 
                         await connection.ExecuteAsync(query, record, transaction: transaction,
