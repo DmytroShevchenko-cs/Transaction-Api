@@ -32,5 +32,8 @@ public class TransactionEntityConfiguration : IEntityTypeConfiguration<Transacti
         builder.Property(t => t.ClientLocation)
             .IsRequired()
             .HasMaxLength(100);
+        
+        builder.Property(t => t.DateTimeUtc)
+            .IsRequired();
     }
 }

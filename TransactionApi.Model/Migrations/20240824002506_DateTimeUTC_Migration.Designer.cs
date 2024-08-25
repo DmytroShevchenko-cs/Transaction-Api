@@ -3,17 +3,20 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TransactionApi.Model;
 
 #nullable disable
 
-namespace TransactionApi.DAL.Migrations
+namespace TransactionApi.Model.Migrations
 {
     [DbContext(typeof(TransactionDbContext))]
-    partial class TransactionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240824002506_DateTimeUTC_Migration")]
+    partial class DateTimeUTC_Migration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
