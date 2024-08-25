@@ -117,7 +117,11 @@ public class TransactionController(ITransactionService transactionService, IFile
     [HttpGet("january")]
     public async Task<IActionResult> GetJanuaryTransactions(CancellationToken cancellationToken)
     {
-        var transactions = await _transactionService.GetTransactionsByDatesAsync(DateTime.Parse("2024-01-01 00:00:00"), DateTime.Parse("2024-01-31 24:00:00"), cancellationToken);
+        // Convert DateOnly to DateTime
+        var dateTimeFrom = DateOnly.Parse("2024-01-01").ToDateTime(TimeOnly.MinValue);
+        var dateTimeTo = DateOnly.Parse("2024-01-31").ToDateTime(TimeOnly.MaxValue); 
+        
+        var transactions = await _transactionService.GetTransactionsByDatesAsync(dateTimeFrom, dateTimeTo, cancellationToken);
         return Ok(transactions);
     }
     
@@ -129,7 +133,11 @@ public class TransactionController(ITransactionService transactionService, IFile
     [HttpGet("export/january")]
     public async Task<IActionResult> ExportJanuaryTransactions(CancellationToken cancellationToken)
     {
-        var transactions = await _transactionService.GetTransactionsByDatesAsync(DateTime.Parse("2024-01-01 00:00:00"), DateTime.Parse("2024-01-31 24:00:00"), cancellationToken);
+        // Convert DateOnly to DateTime
+        var dateTimeFrom = DateOnly.Parse("2024-01-01").ToDateTime(TimeOnly.MinValue);
+        var dateTimeTo = DateOnly.Parse("2024-01-31").ToDateTime(TimeOnly.MaxValue); 
+        
+        var transactions = await _transactionService.GetTransactionsByDatesAsync(dateTimeFrom, dateTimeTo, cancellationToken);
         var xlsx = await _fileConversionService.ConvertToExcelAsync(transactions, cancellationToken);
         return File(xlsx, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "transactions.xlsx");
     }
