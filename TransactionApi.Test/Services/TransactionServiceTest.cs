@@ -2,6 +2,8 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using NodaTime;
+using NodaTime.Extensions;
 using NUnit.Framework;
 using TransactionApi.Model;
 using TransactionApi.Model.Entity;
@@ -37,15 +39,23 @@ public class TransactionServiceTest : DefaultServiceTest<ITransactionService, Tr
                     Amount DECIMAL(18, 2),
                     TransactionDate DATETIME,
                     ClientLocation NVARCHAR(100),
-                    TimeZone NVARCHAR(100)
+                    TimeZone NVARCHAR(100),
+                    DateTimeUtc DATETIME
                 )");
-            
             var testData = TestDataHelper.CreateTestData();
+            
+            foreach (var transaction in testData)
+            {
+                DateTimeZone timeZone = DateTimeZoneProviders.Tzdb[transaction.TimeZone];
+                ZonedDateTime zonedDateTime = transaction.TransactionDate.ToLocalDateTime().InZoneLeniently(timeZone);
+                transaction.DateTimeUtc = zonedDateTime.ToDateTimeUtc();
+            }
+            
             foreach (var transaction in testData)
             {
                 var query = @"
-                    INSERT INTO Transactions (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation, TimeZone)
-                    VALUES (@TransactionId, @Name, @Email, @Amount, @TransactionDate, @ClientLocation, @TimeZone)";
+                    INSERT INTO Transactions (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation, TimeZone, DateTimeUtc)
+                    VALUES (@TransactionId, @Name, @Email, @Amount, @TransactionDate, @ClientLocation, @TimeZone, @DateTimeUtc)";
 
                 await connection.ExecuteAsync(query, transaction);
             }
@@ -72,12 +82,12 @@ public class TransactionServiceTest : DefaultServiceTest<ITransactionService, Tr
     } 
     
     [Test]
-    [TestCase("2024-01-01 00:00:00", "2024-01-31 00:00:00")]// for january 2024
-    [TestCase("2024-01-01 00:00:00", "2024-01-03 00:00:00")]
-    [TestCase("2024-05-01 00:00:00", "2024-07-10 00:00:00")]
-    public async Task GetTransactionByDatesWithLocation(DateTime dateTimeFrom, DateTime dateTimeTo)
+    [TestCase("2024-01-01 00:00:00", "2024-01-31 00:00:00", "Europe/Kiev")] // for January 2024
+    [TestCase("2024-01-01 00:00:00", "2024-01-03 00:00:00", "America/New_York")]
+    [TestCase("2024-05-01 00:00:00", "2024-07-10 00:00:00", "Asia/Tokyo")]
+    public async Task GetTransactionByDatesWithLocation(DateTime dateTimeFrom, DateTime dateTimeTo, string userTimeZoneId)
     {
-        var transactions = await Service.GetTransactionsByUserDatesAsync(dateTimeFrom, dateTimeTo);
-        Assert.That(!transactions.Any(r => r.TransactionDate < dateTimeFrom.AddHours(-26) &&  r.TransactionDate > dateTimeTo.AddHours(26)));
+        var transactions = await Service.GetTransactionsByUserDatesAsync(dateTimeFrom, dateTimeTo, userTimeZoneId);
+        Assert.That(!transactions.Any(r => r.TransactionDate < dateTimeFrom &&  r.TransactionDate > dateTimeTo));
     } 
 }
