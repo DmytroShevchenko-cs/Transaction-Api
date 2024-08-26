@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using TransactionApi.DAL;
 using TransactionApi.Model;
 using TransactionApi.Service.Options;
 
@@ -33,7 +32,7 @@ public abstract class DefaultServiceTest<TService> where TService : class
             {
                 {"TimeZoneApiOption:BaseUrl", "https://api.ipgeolocation.io/timezone"},
                 {"TimeZoneApiOption:ApiKey", "d3aa34850b1240378f798890e2ba637d"},
-                {"ConnectionStrings:ConnectionString", "Server=.;Database=TestTransactionDB;Trusted_Connection=True;Encrypt=False;TrustServerCertificate=True"},
+                {"ConnectionStrings:ConnectionString", "Host=localhost;Database=TestTransactionDb;Username=postgres;Password=verysecurepass"},
             }!)
             .Build();
     }

@@ -1,9 +1,9 @@
 using System.Data;
 using Dapper;
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using NodaTime.Extensions;
+using Npgsql;
 using TransactionApi.Model.Entity;
 using TransactionApi.Service.Options;
 using TransactionApi.Service.Services.Interfaces;
@@ -26,48 +26,37 @@ public class TransactionService(IOptions<DbConnection> connectionString, IGeoloc
         {
             transaction.TimeZone =
                 await geolocationApiService.GetTimeZoneByLocation(transaction.ClientLocation, cancellationToken);
-            
-            DateTimeZone timeZone = DateTimeZoneProviders.Tzdb[transaction.TimeZone];
-            ZonedDateTime zonedDateTime = transaction.TransactionDate.ToLocalDateTime().InZoneLeniently(timeZone);
-            transaction.DateTimeUtc = zonedDateTime.ToDateTimeUtc();
         }
         
-        await using (var connection = new SqlConnection(_connectionString))
+        await using (var connection = new NpgsqlConnection(_connectionString))
         {
             await connection.OpenAsync(cancellationToken);
-            await using (var transaction = connection.BeginTransaction())
+            await using (var transaction = await connection.BeginTransactionAsync(cancellationToken))
             {
                 try
                 {
                     foreach (var record in transactions)
                     {
                         var query = @"
-                            MERGE INTO Transactions AS target
-                            USING (VALUES (@TransactionId, @Name, @Email, @Amount, @TransactionDate, @ClientLocation, @TimeZone, @DateTimeUtc)) 
-                            AS source (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation, TimeZone, DateTimeUtc)
-                            ON target.TransactionId = source.TransactionId
-                            WHEN MATCHED THEN
-                                UPDATE SET Name = source.Name,
-                                           Email = source.Email,
-                                           Amount = source.Amount,
-                                           TransactionDate = source.TransactionDate,
-                                           ClientLocation = source.ClientLocation,
-                                           TimeZone = source.TimeZone,
-                                           DateTimeUtc = source.DateTimeUtc
-                            WHEN NOT MATCHED THEN
-                                INSERT (TransactionId, Name, Email, Amount, TransactionDate, ClientLocation, TimeZone, DateTimeUtc)
-                                VALUES (source.TransactionId, source.Name, source.Email, source.Amount, source.TransactionDate, source.ClientLocation, source.TimeZone, source.DateTimeUtc);";
-
-
-                        await connection.ExecuteAsync(query, record, transaction: transaction,
-                            commandType: CommandType.Text);
+                            INSERT INTO ""Transactions"" (""TransactionId"", ""Name"", ""Email"", ""Amount"", ""TransactionDate"", ""ClientLocation"", ""TimeZone"")
+                            VALUES (@TransactionId, @Name, @Email, @Amount, @TransactionDate, @ClientLocation, @TimeZone)
+                            ON CONFLICT (""TransactionId"") 
+                            DO UPDATE SET
+                                ""Name"" = EXCLUDED.""Name"",
+                                ""Email"" = EXCLUDED.""Email"",
+                                ""Amount"" = EXCLUDED.""Amount"",
+                                ""TransactionDate"" = EXCLUDED.""TransactionDate"",
+                                ""ClientLocation"" = EXCLUDED.""ClientLocation"",
+                                ""TimeZone"" = EXCLUDED.""TimeZone"";";
+                        
+                        await connection.ExecuteAsync(query, record, transaction, commandType: CommandType.Text);
                     }
 
-                    transaction.Commit();
+                    await transaction.CommitAsync(cancellationToken);
                 }
                 catch
                 {
-                    transaction.Rollback();
+                    await transaction.CommitAsync(cancellationToken);
                     throw;
                 }
             }
@@ -82,13 +71,13 @@ public class TransactionService(IOptions<DbConnection> connectionString, IGeoloc
     public async Task<List<TransactionEntity>> GetTransactionsByDatesAsync(DateTime from, DateTime to,
         CancellationToken cancellationToken = default)
     {
-        await using (var connection = new SqlConnection(_connectionString))
+        await using (var connection = new NpgsqlConnection(_connectionString))
         {
-            var query = @"
-                SELECT * FROM Transactions
-                WHERE TransactionDate BETWEEN @From AND @To";
+            var query = $@"
+                SELECT * FROM ""Transactions""
+                WHERE ""TransactionDate"" BETWEEN '{from}' AND '{to}'";
 
-            var transactions = await connection.QueryAsync<TransactionEntity>(query, new { From = from, To = to });
+            var transactions = await connection.QueryAsync<TransactionEntity>(query);
             return transactions.ToList();
         }
     }
@@ -103,15 +92,23 @@ public class TransactionService(IOptions<DbConnection> connectionString, IGeoloc
         
         var fromUtc = LocalDateTime.FromDateTime(from).InZoneLeniently(userTimeZone).ToDateTimeUtc();
         var toUtc = LocalDateTime.FromDateTime(to).InZoneLeniently(userTimeZone).ToDateTimeUtc();
+
         
-        await using (var connection = new SqlConnection(_connectionString))
+        await using (var connection = new NpgsqlConnection(_connectionString))
         {
-            var query = @"
-                SELECT * FROM Transactions
-                WHERE DateTimeUtc BETWEEN @From AND @To";
-    
-            var transactions = await connection.QueryAsync<TransactionEntity>(query,
-                new { From = fromUtc, To = toUtc });
+            var query = $@"SELECT 
+                    ""TransactionId"", 
+                    ""Name"", 
+                    ""Email"", 
+                    ""Amount"", 
+                    ""TransactionDate""::timestamp AS ""TransactionDate"",
+                    ""ClientLocation"",
+                    ""TimeZone""
+                FROM public.""Transactions""
+                WHERE ""TransactionDate"" AT TIME ZONE ""TimeZone"" AT TIME ZONE 'UTC'
+                BETWEEN '{fromUtc}' AND '{toUtc}';";
+            
+            var transactions = await connection.QueryAsync<TransactionEntity>(query);
             
             return transactions.ToList();
         }
