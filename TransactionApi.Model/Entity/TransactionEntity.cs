@@ -12,5 +12,4 @@ public class TransactionEntity
     public string ClientLocation { get; set; } = null!;
     
     public string TimeZone { get; set; } = null!;
-    public DateTime DateTimeUtc { get; set; }
 }

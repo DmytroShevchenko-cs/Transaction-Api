@@ -42,13 +42,10 @@ public class TransactionController(ITransactionService transactionService, IFile
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
     /// <returns>Returns a list of transactions within the specified date range.</returns>
     [HttpGet]
-    public async Task<IActionResult> GetTransactionsByDates([FromQuery]DateOnly dateFrom, [FromQuery]DateOnly dateTo, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetTransactionsByDates([FromQuery]DateTime dateFrom, [FromQuery]DateTime dateTo, CancellationToken cancellationToken)
     {
-        // Convert DateOnly to DateTime
-        var dateTimeFrom = dateFrom.ToDateTime(TimeOnly.MinValue);
-        var dateTimeTo = dateTo.ToDateTime(TimeOnly.MaxValue); 
-        
-        var transactions = await _transactionService.GetTransactionsByDatesAsync(dateTimeFrom, dateTimeTo, cancellationToken);
+        var endDateTo = dateTo.Date.AddDays(1).AddTicks(-1);
+        var transactions = await _transactionService.GetTransactionsByDatesAsync(dateFrom, endDateTo, cancellationToken);
         return Ok(transactions);
     }
     
@@ -60,13 +57,11 @@ public class TransactionController(ITransactionService transactionService, IFile
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
     /// <returns>Returns an Excel file with transactions within the specified date range.</returns>
     [HttpGet("export")]
-    public async Task<IActionResult> ExportTransactionsByDates([FromQuery]DateOnly dateFrom, [FromQuery]DateOnly dateTo, CancellationToken cancellationToken)
+    public async Task<IActionResult> ExportTransactionsByDates([FromQuery]DateTime dateFrom, [FromQuery]DateTime dateTo, CancellationToken cancellationToken)
     {
-        // Convert DateOnly to DateTime
-        var dateTimeFrom = dateFrom.ToDateTime(TimeOnly.MinValue);
-        var dateTimeTo = dateTo.ToDateTime(TimeOnly.MaxValue); 
+        var endDateTo = dateTo.Date.AddDays(1).AddTicks(-1);
         
-        var transactions = await _transactionService.GetTransactionsByDatesAsync(dateTimeFrom, dateTimeTo, cancellationToken);
+        var transactions = await _transactionService.GetTransactionsByDatesAsync(dateFrom, endDateTo, cancellationToken);
         var xlsx = await _fileConversionService.ConvertToExcelAsync(transactions, cancellationToken);
         return File(xlsx, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "transactions.xlsx");
     }
@@ -80,13 +75,11 @@ public class TransactionController(ITransactionService transactionService, IFile
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
     /// <returns>Returns a list of client transactions within the specified date range.</returns>
     [HttpGet("clients")]
-    public async Task<IActionResult> GetTransactionsByUserDates([FromQuery]DateOnly dateFrom, [FromQuery]DateOnly dateTo, [FromQuery]string userTimeZoneId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetTransactionsByUserDates([FromQuery]DateTime dateFrom, [FromQuery]DateTime dateTo, [FromQuery]string userTimeZoneId, CancellationToken cancellationToken)
     {
-        // Convert DateOnly to DateTime
-        var dateTimeFrom = dateFrom.ToDateTime(TimeOnly.MinValue);
-        var dateTimeTo = dateTo.ToDateTime(TimeOnly.MaxValue); 
+        var endDateTo = dateTo.Date.AddDays(1).AddTicks(-1);
        
-        var transactions = await _transactionService.GetTransactionsByUserDatesAsync(dateTimeFrom, dateTimeTo, userTimeZoneId, cancellationToken);
+        var transactions = await _transactionService.GetTransactionsByUserDatesAsync(dateFrom, endDateTo, userTimeZoneId, cancellationToken);
         return Ok(transactions);
     }
     
@@ -98,13 +91,11 @@ public class TransactionController(ITransactionService transactionService, IFile
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
     /// <returns>Returns an Excel file with transactions within the specified date range.</returns>
     [HttpGet("export/clients")]
-    public async Task<IActionResult> ExportTransactionsByUserDates([FromQuery]DateOnly dateFrom, [FromQuery]DateOnly dateTo, [FromQuery]string userTimeZoneId, CancellationToken cancellationToken)
+    public async Task<IActionResult> ExportTransactionsByUserDates([FromQuery]DateTime dateFrom, [FromQuery]DateTime dateTo, [FromQuery]string userTimeZoneId, CancellationToken cancellationToken)
     {
-        // Convert DateOnly to DateTime
-        var dateTimeFrom = dateFrom.ToDateTime(TimeOnly.MinValue);
-        var dateTimeTo = dateTo.ToDateTime(TimeOnly.MaxValue); 
+        var endDateTo = dateTo.Date.AddDays(1).AddTicks(-1);
         
-        var transactions = await _transactionService.GetTransactionsByUserDatesAsync(dateTimeFrom, dateTimeTo, userTimeZoneId, cancellationToken);
+        var transactions = await _transactionService.GetTransactionsByUserDatesAsync(dateFrom, endDateTo, userTimeZoneId, cancellationToken);
         var xlsx = await _fileConversionService.ConvertToExcelAsync(transactions, cancellationToken);
         return File(xlsx, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "transactions.xlsx");
     }

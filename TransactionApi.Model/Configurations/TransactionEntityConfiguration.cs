@@ -24,7 +24,7 @@ public class TransactionEntityConfiguration : IEntityTypeConfiguration<Transacti
 
         builder.Property(t => t.Amount)
             .IsRequired()
-            .HasColumnType("decimal(18,2)"); 
+            .HasColumnType("decimal(18,2)");
 
         builder.Property(t => t.TransactionDate)
             .IsRequired();
@@ -32,8 +32,5 @@ public class TransactionEntityConfiguration : IEntityTypeConfiguration<Transacti
         builder.Property(t => t.ClientLocation)
             .IsRequired()
             .HasMaxLength(100);
-        
-        builder.Property(t => t.DateTimeUtc)
-            .IsRequired();
     }
 }
