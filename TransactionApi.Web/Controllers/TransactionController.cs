@@ -37,8 +37,8 @@ public class TransactionController(ITransactionService transactionService, IFile
     /// <summary>
     /// Retrieves transactions within the specified date range.
     /// </summary>
-    /// <param name="dateFrom">The start date of the range. (yyyy-mm-dd hh:mm:ss)</param>
-    /// <param name="dateTo">The end date of the range. (yyyy-mm-dd hh:mm:ss)</param>
+    /// <param name="dateFrom">The start date of the range. (yyyy-mm-dd)</param>
+    /// <param name="dateTo">The end date of the range. (yyyy-mm-dd)</param>
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
     /// <returns>Returns a list of transactions within the specified date range.</returns>
     [HttpGet]
@@ -53,8 +53,8 @@ public class TransactionController(ITransactionService transactionService, IFile
     /// <summary>
     /// Exports transactions within the specified date range to an Excel file.
     /// </summary>
-    /// <param name="dateFrom">The start date of the range. (yyyy-mm-dd hh:mm:ss)</param>
-    /// <param name="dateTo">The end date of the range. (yyyy-mm-dd hh:mm:ss)</param>
+    /// <param name="dateFrom">The start date of the range. (yyyy-mm-dd)</param>
+    /// <param name="dateTo">The end date of the range. (yyyy-mm-dd)</param>
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
     /// <returns>Returns an Excel file with transactions within the specified date range.</returns>
     [HttpGet("export")]
@@ -72,8 +72,8 @@ public class TransactionController(ITransactionService transactionService, IFile
     /// <summary>
     /// Retrieves transactions by clients within the specified date range.
     /// </summary>
-    /// <param name="dateFrom">The start date of the range. (yyyy-mm-dd hh:mm:ss)</param>
-    /// <param name="dateTo">The end date of the range. (yyyy-mm-dd hh:mm:ss)</param>
+    /// <param name="dateFrom">The start date of the range. (yyyy-mm-dd)</param>
+    /// <param name="dateTo">The end date of the range. (yyyy-mm-dd)</param>
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
     /// <returns>Returns a list of client transactions within the specified date range.</returns>
     [HttpGet("clients")]
@@ -89,8 +89,8 @@ public class TransactionController(ITransactionService transactionService, IFile
     /// <summary>
     /// Exports transactions within the specified date range to an Excel file.
     /// </summary>
-    /// <param name="dateFrom">The start date of the range. (yyyy-mm-dd hh:mm:ss)</param>
-    /// <param name="dateTo">The end date of the range. (yyyy-mm-dd hh:mm:ss)</param>
+    /// <param name="dateFrom">The start date of the range. (yyyy-mm-dd)</param>
+    /// <param name="dateTo">The end date of the range. (yyyy-mm-dd)</param>
     /// <param name="cancellationToken">Token to monitor for cancellation requests.</param>
     /// <returns>Returns an Excel file with transactions within the specified date range.</returns>
     [HttpGet("export/clients")]
