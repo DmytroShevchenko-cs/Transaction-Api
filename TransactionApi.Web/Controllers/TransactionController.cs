@@ -44,8 +44,9 @@ public class TransactionController(ITransactionService transactionService, IFile
     [HttpGet]
     public async Task<IActionResult> GetTransactionsByDates([FromQuery]DateTime dateFrom, [FromQuery]DateTime dateTo, CancellationToken cancellationToken)
     {
+        var startDateFrom = dateFrom.Date;
         var endDateTo = dateTo.Date.AddDays(1).AddTicks(-1);
-        var transactions = await _transactionService.GetTransactionsByDatesAsync(dateFrom, endDateTo, cancellationToken);
+        var transactions = await _transactionService.GetTransactionsByDatesAsync(startDateFrom, endDateTo, cancellationToken);
         return Ok(transactions);
     }
     
@@ -59,9 +60,10 @@ public class TransactionController(ITransactionService transactionService, IFile
     [HttpGet("export")]
     public async Task<IActionResult> ExportTransactionsByDates([FromQuery]DateTime dateFrom, [FromQuery]DateTime dateTo, CancellationToken cancellationToken)
     {
+        var startDateFrom = dateFrom.Date;
         var endDateTo = dateTo.Date.AddDays(1).AddTicks(-1);
         
-        var transactions = await _transactionService.GetTransactionsByDatesAsync(dateFrom, endDateTo, cancellationToken);
+        var transactions = await _transactionService.GetTransactionsByDatesAsync(startDateFrom, endDateTo, cancellationToken);
         var xlsx = await _fileConversionService.ConvertToExcelAsync(transactions, cancellationToken);
         return File(xlsx, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "transactions.xlsx");
     }
@@ -77,9 +79,10 @@ public class TransactionController(ITransactionService transactionService, IFile
     [HttpGet("clients")]
     public async Task<IActionResult> GetTransactionsByUserDates([FromQuery]DateTime dateFrom, [FromQuery]DateTime dateTo, [FromQuery]string userTimeZoneId, CancellationToken cancellationToken)
     {
+        var startDateFrom = dateFrom.Date;
         var endDateTo = dateTo.Date.AddDays(1).AddTicks(-1);
        
-        var transactions = await _transactionService.GetTransactionsByUserDatesAsync(dateFrom, endDateTo, userTimeZoneId, cancellationToken);
+        var transactions = await _transactionService.GetTransactionsByUserDatesAsync(startDateFrom, endDateTo, userTimeZoneId, cancellationToken);
         return Ok(transactions);
     }
     
@@ -93,9 +96,10 @@ public class TransactionController(ITransactionService transactionService, IFile
     [HttpGet("export/clients")]
     public async Task<IActionResult> ExportTransactionsByUserDates([FromQuery]DateTime dateFrom, [FromQuery]DateTime dateTo, [FromQuery]string userTimeZoneId, CancellationToken cancellationToken)
     {
+        var startDateFrom = dateFrom.Date;
         var endDateTo = dateTo.Date.AddDays(1).AddTicks(-1);
         
-        var transactions = await _transactionService.GetTransactionsByUserDatesAsync(dateFrom, endDateTo, userTimeZoneId, cancellationToken);
+        var transactions = await _transactionService.GetTransactionsByUserDatesAsync(startDateFrom, endDateTo, userTimeZoneId, cancellationToken);
         var xlsx = await _fileConversionService.ConvertToExcelAsync(transactions, cancellationToken);
         return File(xlsx, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "transactions.xlsx");
     }
