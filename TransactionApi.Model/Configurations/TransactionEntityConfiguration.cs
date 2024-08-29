@@ -27,6 +27,7 @@ public class TransactionEntityConfiguration : IEntityTypeConfiguration<Transacti
             .HasColumnType("decimal(18,2)");
 
         builder.Property(t => t.TransactionDate)
+            .HasColumnType("timestamp")
             .IsRequired();
 
         builder.Property(t => t.ClientLocation)
