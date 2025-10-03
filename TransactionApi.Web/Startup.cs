@@ -28,11 +28,11 @@ public class Startup
         services.AddScoped<ITransactionService, TransactionService>();
         services.AddScoped<IGeolocationApiService, GeolocationApiService>();
         services.AddScoped<IFileConversionService, FileConversionService>();
-        
+
         services.Configure<TimeZoneApiOption>(Configuration.GetSection("TimeZoneApiOption"));
         services.Configure<DbConnection>(Configuration.GetSection("ConnectionStrings"));
         services.AddTransient<HttpClient>();
-        
+
         services.AddControllers();
         services.AddSwaggerGen(c =>
         {
@@ -52,15 +52,17 @@ public class Startup
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        //check current project configuration
+
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Transaction API V1");
+            c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
+        });
+
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Transaction API V1");
-            });
         }
         else
         {
@@ -70,7 +72,7 @@ public class Startup
 
         app.UseRouting();
         app.UseCors(b => b.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-        
+
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();
