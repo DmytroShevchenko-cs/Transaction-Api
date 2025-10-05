@@ -9,8 +9,7 @@ public class Program
     {
         var builder = CreateHostBuilder(args);
         var host = builder.Build();
-        
-        // Выполняем миграции при старте
+
         using (var scope = host.Services.CreateScope())
         {
             var context = scope.ServiceProvider.GetRequiredService<TransactionDbContext>();
@@ -24,7 +23,7 @@ public class Program
                 Console.Error.WriteLine($"Error during migration: {ex.Message}");
             }
         }
-        
+
         host.Run();
     }
 
