@@ -5,7 +5,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <NoWarn>$(NoWarn);1591</NoWarn> <!-- Убирает предупреждения о отсутствующих комментариях -->
+        <NoWarn>$(NoWarn);1591</NoWarn>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS> <!-- Убирает предупреждения о отсутствующих комментариях -->
     </PropertyGroup>
     
     <ItemGroup>
@@ -25,6 +26,12 @@
     <ItemGroup>
       <ProjectReference Include="..\TransactionApi.Service\TransactionApi.Service.csproj" />
       <ProjectReference Include="..\TransactionApi.Model\TransactionApi.Model.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>

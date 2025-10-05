@@ -1,0 +1,30 @@
+﻿services:
+  transactionapi.web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    container_name: transactionapi.web
+    restart: always
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - CONNECTION_STRING=Host=transactionapi.db;Database=TransactionDb;Username=postgres;Password=verysecurepass
+    depends_on:
+      - transactionapi.db
+  transactionapi.db:
+    image: postgres:latest
+    container_name: transactionapi.db
+    ports:
+      - 5432:5432
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=verysecurepass
+      - POSTGRES_DB=TransactionDb
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:
+

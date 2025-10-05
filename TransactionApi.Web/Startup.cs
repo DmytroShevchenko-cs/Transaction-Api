@@ -56,17 +56,19 @@ public class Startup
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Transaction API V1");
-            });
         }
         else
         {
             app.UseExceptionHandler("/Error");
             app.UseHsts();
         }
+        
+        // Enable Swagger in all environments
+        app.UseSwagger();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "Transaction API V1");
+        });
 
         app.UseRouting();
         app.UseCors(b => b.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
